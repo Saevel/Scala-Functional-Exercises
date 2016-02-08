@@ -21,14 +21,10 @@ trait CountingSort[TYPE <: Traversable[Int]] { collection:TYPE =>
 
     val summedOccurences = sumOccurences(occurences)
 
-    //TODO: Min ?!
-
-    //reverseTranslate(fillFinalArray(summedOccurences), collection.min)
-
-    ???
+    reverseTranslate(fillFinalArray(summedOccurences), findMin(collection))
   }
 
-  def sumOccurences(input:Array[Int]):Array[Int] = {
+  private def sumOccurences(input:Array[Int]):Array[Int] = {
     for(i <- 1 to input.size) {
       input(i) = input(i) + input(i-1)
     }
@@ -36,9 +32,15 @@ trait CountingSort[TYPE <: Traversable[Int]] { collection:TYPE =>
     input
   }
 
-  def findMin():Int = {
+  private def findMin(col:Traversable[Int]):Int = {
     var min = Int.MaxValue;
 
-    ???
+    for(element <- col) {
+      if(element < min) {
+        min = element
+      }
+    }
+
+    min
   }
 }
