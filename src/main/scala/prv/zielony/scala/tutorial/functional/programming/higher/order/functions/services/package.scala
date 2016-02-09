@@ -9,8 +9,6 @@ import prv.zielony.scala.tutorial.functional.programming.higher.order.functions.
   */
 package object services {
 
-  //TODO: Kursant ma sam podkonfigurowac metode biznesowa metodami DAOsowymi zeby spelniala odpowiednie warunki
-
   private def findPersonsAccountBalanceDef(findPerson:(Long => Option[Person]))(findAccount:(Long => Option[Account]))(id:Long) = {
 
     findPerson(id).flatMap { person =>
@@ -20,5 +18,7 @@ package object services {
     }.getOrElse(0.0)
   }
 
-  val findAccountBalanceForPerson:(Long => Double) = findPersonsAccountBalanceDef(findPersonById)(findAccountById)
+  val findAccountBalanceForPerson:(Long => Double) = ???
+
+  val findPerson:(Long => Option[Person]) = ???
 }

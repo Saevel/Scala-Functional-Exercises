@@ -9,16 +9,46 @@ import scala.collection.mutable.ListBuffer;
   */
 trait EntityManager {
 
-  //TODO: Implement
-
   val persistedObjects:ListBuffer[AnyRef with PrimaryKey] = new ListBuffer[AnyRef with PrimaryKey];
 
-  def save(entity:AnyRef with PrimaryKey):AnyRef with PrimaryKey;
+  def persist[EntityType <: AnyRef with PrimaryKey](entity:EntityType):EntityType  = {
+    persistedObjects += entity
+
+    entity
+  }
 
   def find[PrimaryKeyType, EntityType](id:PrimaryKeyType,
-                                       clazz:Class[EntityType]):Option[EntityType with PrimaryKey[PrimaryKeyType]]
+                                       clazz:Class[EntityType]):Option[EntityType with PrimaryKey[PrimaryKeyType]] = {
 
-  def delete[PrimaryKeyType, EntityType](entity:EntityType with PrimaryKey[PrimaryKeyType]):Boolean
+    for(entity <- persistedObjects) {
+      if(entity.getClass.isAssignableFrom(clazz) && entity.id == id) {
+        return Some(entity.asInstanceOf[EntityType with PrimaryKey[PrimaryKeyType]]);
+      }
+    }
 
-  def update[PrimaryKeyType, EntityType](entity:EntityType with PrimaryKey[PrimaryKeyType]):EntityType with PrimaryKey[PrimaryKeyType]
+    None
+  }
+
+  def delete[EntityType <: AnyRef with PrimaryKey](entity:EntityType):Boolean = {
+
+    if(persistedObjects.contains(entity)) {
+      persistedObjects.-=(entity)
+      true;
+    }
+    else {
+      false;
+    }
+  }
+
+  def update[EntityType <: AnyRef with PrimaryKey](entity:EntityType):Unit = {
+
+    var persistentObject:AnyRef with PrimaryKey = null;
+    for(i <- 0 to persistedObjects.size) {
+
+      persistentObject = persistedObjects(i)
+      if(persistentObject.getClass.isAssignableFrom(entity.getClass) && entity.id == persistentObject.id) {
+        persistedObjects(i) = entity;
+      }
+    }
+  }
 }

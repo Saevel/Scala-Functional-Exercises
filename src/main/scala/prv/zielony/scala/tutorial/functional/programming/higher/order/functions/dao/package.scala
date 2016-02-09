@@ -7,10 +7,7 @@ import prv.zielony.scala.tutorial.functional.programming.higher.order.functions.
   */
 package object dao {
 
-  //TODO: Create when implemented
-  private val defaultEntityManager:EntityManager = ???
-
-  //TODO: Kursant sam ma podkonfigurowac metody defaultEntityManager'em zeby uzyskac poprawne sygnatury
+  private val defaultEntityManager:EntityManager = new EntityManager{};
 
   private def findAccountDef(entityManager:EntityManager)(id:Long) =
     entityManager.find(id, classOf[Account])
@@ -18,8 +15,20 @@ package object dao {
   private def findPersonDef(entityManager: EntityManager)(id:Long) =
     entityManager.find(id, classOf[Person])
 
+  def saveDef[PrimaryKeyType, EntityType <: AnyRef with PrimaryKey[PrimaryKeyType]]
+    (entityManager: EntityManager)(entity:EntityType) = {
 
-  val findAccountById:(Long => Option[Account with PrimaryKey[Long]]) = findAccountDef(defaultEntityManager)
+    if(entityManager.find(entity.id, entity.getClass).isDefined) {
+      entityManager.update(entity)
+    }
+    else {
+      entityManager.persist(entity)
+    }
+  }
 
-  val findPersonById:(Long => Option[Person with PrimaryKey[Long]]) = findPersonDef(defaultEntityManager)
+  val save = saveDef(defaultEntityManager)
+
+  val findAccountById:(Long => Option[Account with PrimaryKey[Long]]) = ???
+
+  val findPersonById:(Long => Option[Person with PrimaryKey[Long]]) = ???
 }
