@@ -9,10 +9,10 @@ import scala.collection.mutable.ListBuffer;
   */
 trait EntityManager {
 
-  val persistedObjects:ListBuffer[AnyRef with PrimaryKey] = new ListBuffer[AnyRef with PrimaryKey];
+  val persistedObjects:ListBuffer[AnyRef with PrimaryKey[Any]] = new ListBuffer[AnyRef with PrimaryKey[Any]];
 
-  def persist[EntityType <: AnyRef with PrimaryKey](entity:EntityType):EntityType  = {
-    persistedObjects += entity
+  def persist[EntityType <: AnyRef with PrimaryKey[Any]](entity:EntityType):EntityType  = {
+    persistedObjects.+=(entity)
 
     entity
   }
@@ -29,10 +29,10 @@ trait EntityManager {
     None
   }
 
-  def delete[EntityType <: AnyRef with PrimaryKey](entity:EntityType):Boolean = {
+  def delete[EntityType <: PrimaryKey[Any]](entity:EntityType):Boolean = {
 
     if(persistedObjects.contains(entity)) {
-      persistedObjects.-=(entity)
+      persistedObjects -= entity
       true;
     }
     else {
@@ -40,14 +40,11 @@ trait EntityManager {
     }
   }
 
-  def update[EntityType <: AnyRef with PrimaryKey](entity:EntityType):Unit = {
+  def update[PrimaryKeyType, EntityType <: PrimaryKey[Any]](entity:EntityType):Unit = {
 
-    var persistentObject:AnyRef with PrimaryKey = null;
     for(i <- 0 to persistedObjects.size) {
-
-      persistentObject = persistedObjects(i)
-      if(persistentObject.getClass.isAssignableFrom(entity.getClass) && entity.id == persistentObject.id) {
-        persistedObjects(i) = entity;
+      if(persistedObjects(i).getClass.isAssignableFrom(entity.getClass) && entity.id == persistedObjects(i).id) {
+        persistedObjects(i) = entity
       }
     }
   }

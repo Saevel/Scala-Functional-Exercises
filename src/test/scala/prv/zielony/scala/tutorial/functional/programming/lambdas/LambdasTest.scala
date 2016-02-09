@@ -31,22 +31,22 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
   val intGenerator = Gen.choose[Int](0, 1000);
 
   val zeroBasedCollectionGenerator:Gen[List[Int]] = for {
-    zero <- Gen.const(0)
+    zero <- Gen.const[Int](0)
     size <- sizeGenerator
-    list <- Gen.listOfN(size, intGenerator);
-  } yield( zero :: list)
+    list <- Gen.listOfN[Int](size, intGenerator)
+  } yield(zero :: list)
 
   val assuredCountCollectionGenerator:Gen[Tuple3[List[Int], Int, Int]] = for {
     number <- intGenerator
     count <- intGenerator
-    numberOccurences <- Gen.listOfN[Int](count, Gen.const(number))
+    numberOccurences <- Gen.listOfN[Int](count, Gen.const[Int](number))
     lowerBound <- lowerBoundGenerator
     upperBound <- upperBoundGenerator
     size <- sizeGenerator
-    result <- Gen.listOfN(size, Gen.choose[[Int](lowerBound, upperBound)).suchThat { element =>
+    result <- Gen.listOfN[Int](size, Gen.choose[Int](lowerBound, upperBound)).suchThat { element =>
       element != number
     }
-  } yield((numberOccurences :: result, number, count))
+  } yield((result ++ numberOccurences, number, count))
 
   test("is defined for all integer collections") {
     check( Prop.forAll(collectionGenerator) { collection => {

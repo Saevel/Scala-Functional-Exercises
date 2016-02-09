@@ -11,19 +11,27 @@ trait FileParser {
 
     file.map { actualFile =>
 
+      if(actualFile.isDirectory || !actualFile.exists) {
+        return Left(new FileNotFoundError(actualFile.getName))
+      }
+
       val reader = new BufferedReader(new InputStreamReader(new FileInputStream(actualFile)))
       var result:List[Int] = List();
 
       var line:String = "";
-      while((line = (reader.readLine())) != null) {
-        result = line.toInt :: result
-      }
+      try {
+        while((line = (reader.readLine())) != null) {
+          result = line.toInt :: result
+        }
 
-      Right(result)
+        return Right(result)
+      }
+      catch {
+        case numberFormatException:NumberFormatException => Left(NumberFormatError(line))
+      }
     }.getOrElse(Left(FileNotFoundError(null)));
   }
 }
-
 
 class ParserError(val cause:String);
 
