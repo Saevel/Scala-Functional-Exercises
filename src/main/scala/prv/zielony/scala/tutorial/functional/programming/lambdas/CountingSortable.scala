@@ -3,7 +3,9 @@ package prv.zielony.scala.tutorial.functional.programming.lambdas
 /**
  * Created by zielony on 07.02.16.
  */
-trait CountingSort { collection:Traversable[Int] =>
+trait CountingSortable { /*collection:Traversable[Int] =>*/
+
+  val collection:Traversable[Int];
 
   var translateCollection:(Traversable[Int] => Traversable[Int]) = ???
 

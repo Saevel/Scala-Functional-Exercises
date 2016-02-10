@@ -60,9 +60,10 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
         val result = collection.countingSort()
 
         var sorted:Boolean = true;
-
-        for(i <- 0 until result.size-1) {
-          sorted =  sorted && (compareInts(result(i), result(i+1)) <= 0)
+        var previousElement = Int.MinValue
+        for(element <- result) {
+          sorted = sorted && (previousElement <= element);
+          previousElement = element;
         }
 
         sorted
@@ -121,33 +122,15 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
     })
   }
 
+  /*
   test("element is inserted into the final array at a correct place") {
     check( Prop.forAll(assuredCountCollectionGenerator) { triple =>
       val (collection, number, count) = triple;
 
-      val finalArray = collection.fillFinalArray(collection)
+      val finalArray = collection.fillFinalArray
 
       finalArray(count-1) == number
     })
   }
-
-  /*
-  test("correct element translation") {
-    check( Prop.forAll(collectionGenerator) { collection => {
-
-      val translated = collection.translateCollectionRange(collection)
-
-      val min = collection.min
-
-      for(element <- collection; translatedElement <- translated) {
-
-        translatedElement == element - min
-
-      }
-
-      ???
-    }})
-  }
   */
-
 }

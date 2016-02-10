@@ -21,7 +21,7 @@ class FileParserTest extends FunSuite with Checkers with PropertyChecks with Fil
   test("defined for an existing file") {
     check( Prop.forAll(existingFileGenerator){ file =>
 
-      val inputFile = new File(getClass.getResource(file).getFile)
+      val inputFile = new File(getClass.getResource("/" + file).getFile)
       parseIntFile(Option(inputFile)).isRight
     })
   }
