@@ -15,8 +15,8 @@ package object dao {
   private def findPersonDef(entityManager: EntityManager)(id:Long) =
     entityManager.find(id, classOf[Person])
 
-  def saveDef[PrimaryKeyType, EntityType <: PrimaryKey[Any]]
-    (entityManager: EntityManager)(entity:EntityType) = {
+  def saveDef[PrimaryKeyType, EntityType]
+    (entityManager: EntityManager)(entity:EntityType with PrimaryKey[PrimaryKeyType]) = {
 
     if(entityManager.find(entity.id, entity.getClass).isDefined) {
       entityManager.update[PrimaryKeyType, EntityType](entity)
