@@ -15,18 +15,18 @@ package object dao {
   private def findPersonDef(entityManager: EntityManager)(id:Long) =
     entityManager.find(id, classOf[Person])
 
-  def saveDef[PrimaryKeyType, EntityType <: AnyRef with PrimaryKey[PrimaryKeyType]]
+  def saveDef[PrimaryKeyType, EntityType <: PrimaryKey[Any]]
     (entityManager: EntityManager)(entity:EntityType) = {
 
     if(entityManager.find(entity.id, entity.getClass).isDefined) {
-      entityManager.update(entity)
+      entityManager.update[PrimaryKeyType, EntityType](entity)
     }
     else {
-      entityManager.persist(entity)
+      entityManager.persist[EntityType](entity)
     }
   }
 
-  val save = saveDef(defaultEntityManager)
+  val save = saveDef(defaultEntityManager)_
 
   val findAccountById:(Long => Option[Account with PrimaryKey[Long]]) = ???
 

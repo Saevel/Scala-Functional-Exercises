@@ -31,22 +31,22 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
   val intGenerator = Gen.choose[Int](0, 1000);
 
   val zeroBasedCollectionGenerator:Gen[List[Int]] = for {
-    zero <- Gen.const(0)
+    zero <- Gen.const[Int](0)
     size <- sizeGenerator
-    list <- Gen.listOfN(size, intGenerator);
-  } yield( zero :: list)
+    list <- Gen.listOfN[Int](size, intGenerator)
+  } yield(zero :: list)
 
   val assuredCountCollectionGenerator:Gen[Tuple3[List[Int], Int, Int]] = for {
     number <- intGenerator
     count <- intGenerator
-    numberOccurences <- Gen.listOfN[Int](count, Gen.const(number))
+    numberOccurences <- Gen.listOfN[Int](count, Gen.const[Int](number))
     lowerBound <- lowerBoundGenerator
     upperBound <- upperBoundGenerator
     size <- sizeGenerator
-    result <- Gen.listOfN(size, Gen.choose[[Int](lowerBound, upperBound)).suchThat { element =>
+    result <- Gen.listOfN[Int](size, Gen.choose[Int](lowerBound, upperBound)).suchThat { element =>
       element != number
     }
-  } yield((numberOccurences :: result, number, count))
+  } yield((result ++ numberOccurences, number, count))
 
   test("is defined for all integer collections") {
     check( Prop.forAll(collectionGenerator) { collection => {
@@ -60,9 +60,10 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
         val result = collection.countingSort()
 
         var sorted:Boolean = true;
-
-        for(i <- 0 until result.size-1) {
-          sorted =  sorted && (compareInts(result(i), result(i+1)) <= 0)
+        var previousElement = Int.MinValue
+        for(element <- result) {
+          sorted = sorted && (previousElement <= element);
+          previousElement = element;
         }
 
         sorted
@@ -121,33 +122,15 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
     })
   }
 
+  /*
   test("element is inserted into the final array at a correct place") {
     check( Prop.forAll(assuredCountCollectionGenerator) { triple =>
       val (collection, number, count) = triple;
 
-      val finalArray = collection.fillFinalArray(collection)
+      val finalArray = collection.fillFinalArray
 
       finalArray(count-1) == number
     })
   }
-
-  /*
-  test("correct element translation") {
-    check( Prop.forAll(collectionGenerator) { collection => {
-
-      val translated = collection.translateCollectionRange(collection)
-
-      val min = collection.min
-
-      for(element <- collection; translatedElement <- translated) {
-
-        translatedElement == element - min
-
-      }
-
-      ???
-    }})
-  }
   */
-
 }

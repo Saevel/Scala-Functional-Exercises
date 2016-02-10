@@ -3,17 +3,19 @@ package prv.zielony.scala.tutorial.functional.programming.lambdas
 /**
  * Created by zielony on 07.02.16.
  */
-trait CountingSort[TYPE <: Traversable[Int]] { collection:TYPE =>
+trait CountingSortable { /*collection:Traversable[Int] =>*/
 
-  var translateCollection:(TYPE => TYPE) = ???
+  val collection:Traversable[Int];
 
-  var countOccurences:(TYPE => Array[Int]) = ???
+  var translateCollection:(Traversable[Int] => Traversable[Int]) = ???
 
-  var fillFinalArray:(Array[Int] => TYPE) = ???
+  var countOccurences:(Traversable[Int] => Array[Int]) = ???
 
-  var reverseTranslate:((TYPE, Int) => TYPE) = ???
+  var fillFinalArray:(Array[Int] => Traversable[Int]) = ???
 
-  def countingSort():TYPE = {
+  var reverseTranslate:((Traversable[Int], Int) => Traversable[Int]) = ???
+
+  def countingSort():Traversable[Int] = {
 
     val mappedCollection = translateCollection(collection)
 
