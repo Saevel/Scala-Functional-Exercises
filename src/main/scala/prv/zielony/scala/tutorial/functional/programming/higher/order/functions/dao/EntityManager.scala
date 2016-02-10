@@ -9,16 +9,16 @@ import scala.collection.mutable.ListBuffer;
   */
 trait EntityManager {
 
-  val persistedObjects:ListBuffer[AnyRef with PrimaryKey[Any]] = new ListBuffer[AnyRef with PrimaryKey[Any]];
+  val persistedObjects:ListBuffer[PrimaryKey[_]] = new ListBuffer[PrimaryKey[_]];
 
-  def persist[EntityType <: AnyRef with PrimaryKey[Any]](entity:EntityType):EntityType  = {
-    persistedObjects.+=(entity)
+  def persist[EntityType](entity:EntityType with PrimaryKey[_]):EntityType with PrimaryKey[_]  = {
+    persistedObjects += entity
 
     entity
   }
 
   def find[PrimaryKeyType, EntityType](id:PrimaryKeyType,
-                                       clazz:Class[EntityType]):Option[EntityType with PrimaryKey[PrimaryKeyType]] = {
+                                       clazz:Class[EntityType]):Option[EntityType with PrimaryKey[_]] = {
 
     for(entity <- persistedObjects) {
       if(entity.getClass.isAssignableFrom(clazz) && entity.id == id) {
@@ -29,7 +29,7 @@ trait EntityManager {
     None
   }
 
-  def delete[EntityType <: PrimaryKey[Any]](entity:EntityType):Boolean = {
+  def delete[EntityType](entity:EntityType with PrimaryKey[_]):Boolean = {
 
     if(persistedObjects.contains(entity)) {
       persistedObjects -= entity
@@ -40,7 +40,7 @@ trait EntityManager {
     }
   }
 
-  def update[PrimaryKeyType, EntityType <: PrimaryKey[Any]](entity:EntityType):Unit = {
+  def update[PrimaryKeyType, EntityType](entity:EntityType with PrimaryKey[PrimaryKeyType]):Unit = {
 
     for(i <- 0 to persistedObjects.size) {
       if(persistedObjects(i).getClass.isAssignableFrom(entity.getClass) && entity.id == persistedObjects(i).id) {

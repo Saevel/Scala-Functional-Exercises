@@ -3,4 +3,4 @@ package prv.zielony.scala.tutorial.functional.programming.higher.order.functions
 /**
   * Created by kowczarek on 2016-02-08.
   */
-case class Person(val name:String, val surname:String, var age:Int, val accountId:Long);
+case class Person(val name:String, val surname:String, var age:Int, var accountId:Long = 0);

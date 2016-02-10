@@ -14,15 +14,43 @@ import java.io.File;
 @RunWith(classOf[JUnitRunner])
 class FileParserTest extends FunSuite with Checkers with PropertyChecks with FileParser {
 
-  val existingFileGenerator = Gen.const("existing.file")
+  val existingFileGenerator = Gen.oneOf("existing.file", "nonparseable.file")
 
-  val nonexistentFileGenerator = Gen.numStr.suchThat { _ != "existing.file"}
+  val nonParseableFileGenerator = Gen.const("nonparseable.file")
+
+  val nonexistentFileGenerator = Gen.numStr.suchThat { name =>
+    name != "existing.file" && name != "nonparseable.file"
+  }
 
   test("defined for an existing file") {
     check( Prop.forAll(existingFileGenerator){ file =>
 
       val inputFile = new File(getClass.getResource("/" + file).getFile)
       parseIntFile(Option(inputFile)).isRight
+    })
+  }
+
+  test("FileNotFoundError for nonexisting file") {
+    check(Prop.forAll(nonexistentFileGenerator) { file =>
+
+      val inputFile = new File(getClass.getResource("/" + file).getFile)
+
+      parseIntFile(Option(inputFile)) match {
+        case Left(fileNotFound:FileNotFoundError) => true
+        case _ => false
+      }
+    })
+  }
+
+  test("NumberFormatError for wrongly formated file") {
+    check(Prop.forAll(nonParseableFileGenerator) { file =>
+
+      val inputFile = new File(getClass.getResource("/" + file).getFile)
+
+      parseIntFile(Option(inputFile)) match {
+        case Left(numberFormatError:NumberFormatError) => true
+        case _ => false
+      }
     })
   }
 }
