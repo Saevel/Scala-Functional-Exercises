@@ -7,13 +7,48 @@ trait CountingSortable { /*collection:Traversable[Int] =>*/
 
   val collection:Traversable[Int];
 
-  var translateCollection:(Traversable[Int] => Traversable[Int]) = ???
+  var translateCollection:(Traversable[Int] => Traversable[Int]) = { collection =>
 
-  var countOccurences:(Traversable[Int] => Array[Int]) = ???
+    val min = collection.min
 
-  var fillFinalArray:(Array[Int] => Traversable[Int]) = ???
+    collection.map { element =>
+      element - min
+    }
+  }
 
-  var reverseTranslate:((Traversable[Int], Int) => Traversable[Int]) = ???
+  var countOccurences:(Traversable[Int] => Array[Int]) = { collection =>
+
+    val occurences:Array[Int] = new Array[Int](collection.max)
+
+    for(element <- collection) {
+      occurences(element) += 1
+    }
+
+    for(i <- 1 to occurences.size){
+      occurences(i) += occurences(i-1)
+    }
+
+    occurences
+  }
+
+  var fillFinalArray:(Array[Int] => Traversable[Int]) = { array =>
+
+    var result:List[Int] = List()
+
+    for(i <- 1 to array.size) {
+      for( j <- array(i-1) to array(i)) {
+        result = i :: result
+      }
+    }
+
+    result
+  }
+
+  var reverseTranslate:((Traversable[Int], Int) => Traversable[Int]) = { (collection, min) =>
+    collection.map { element =>
+      element + min
+    }
+  }
 
   def countingSort():Traversable[Int] = {
 
