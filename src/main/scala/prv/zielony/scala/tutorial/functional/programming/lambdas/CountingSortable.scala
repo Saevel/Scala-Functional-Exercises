@@ -10,7 +10,6 @@ trait CountingSortable { /*collection:Traversable[Int] =>*/
   var translateCollection:(Traversable[Int] => Traversable[Int]) = { collection =>
 
     val min = collection.min
-
     collection.map { element =>
       element - min
     }

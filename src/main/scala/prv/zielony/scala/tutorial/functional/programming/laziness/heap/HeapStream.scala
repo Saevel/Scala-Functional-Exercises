@@ -9,17 +9,17 @@ class HeapStream[ElementType](val content:ElementType, left: => HeapStream[Eleme
   def ++(element:ElementType):HeapStream[ElementType] = {
 
     if(compare(element, content) > 0 ) {
-      new HeapStream[ElementType](element, this, null)(compare)
+      return new HeapStream[ElementType](element, this, null)(compare)
     }
-    else if(left == null) {
+    else if(left != null) {
       left ++ element
     }
-    else {
+    else if(right != null){
       right ++ element
     }
 
     //TODO: Fixme
-    return new HeapStream(element, this, this)(compare);
+    return new HeapStream(element, left, right)(compare);
   }
 
   def --():(ElementType, HeapStream[ElementType]) = {
