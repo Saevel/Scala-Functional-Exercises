@@ -33,9 +33,11 @@ class FileParserTest extends FunSuite with Checkers with PropertyChecks with Fil
   test("FileNotFoundError for nonexisting file") {
     check(Prop.forAll(nonexistentFileGenerator) { file =>
 
-      val inputFile = new File(getClass.getResource("/" + file).getFile)
+      val inputFile = Option(getClass.getResource("/" + file)).map { url =>
+        new File(url.getFile)
+      }
 
-      parseIntFile(Option(inputFile)) match {
+      parseIntFile(inputFile) match {
         case Left(fileNotFound:FileNotFoundError) => true
         case _ => false
       }
