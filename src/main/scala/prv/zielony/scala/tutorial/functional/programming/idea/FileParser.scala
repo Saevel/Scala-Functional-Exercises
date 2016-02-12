@@ -20,8 +20,11 @@ trait FileParser {
 
       var line:String = "";
       try {
-        while((line = (reader.readLine())) != null) {
-          result = line.toInt :: result
+        while(line != null) {
+          if(!line.equals("")) {
+            result = line.toInt :: result
+          }
+          line = reader.readLine()
         }
 
         return Right(result)

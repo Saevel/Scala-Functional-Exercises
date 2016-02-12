@@ -23,10 +23,10 @@ object ErastotenesPrimeFinder {
     } yield(Range(min, max))
     */
 
-    val ranges = IndexedSeq(Range(0, Math.floorDiv(upperCheckLimit, 4)),
-      Range(Math.floorDiv(upperCheckLimit, 4), Math.floorDiv(upperCheckLimit, 2)),
-      Range(Math.floorDiv(upperCheckLimit, 2), Math.floor(3*upperCheckLimit/4).toInt),
-      Range(Math.floor(3*upperCheckLimit/4).toInt, upperCheckLimit))
+    val ranges = IndexedSeq((2 to Math.ceil(upperCheckLimit/4).toInt),
+      (Math.ceil(upperCheckLimit/4).toInt to Math.ceil(upperCheckLimit/2).toInt),
+      (Math.ceil(upperCheckLimit/2).toInt to Math.ceil(3*upperCheckLimit/4).toInt),
+      (Math.ceil(3*upperCheckLimit/4).toInt to upperCheckLimit))
 
     val removedSets = for {
       shieve <- shieves
@@ -35,7 +35,7 @@ object ErastotenesPrimeFinder {
 
     val removed:ListBuffer[Int] = new ListBuffer[Int]
     for(set <- removedSets) {
-      removed ++ set
+      removed ++= set
     }
 
     val result = data.dropWhile { element =>
@@ -44,5 +44,4 @@ object ErastotenesPrimeFinder {
 
     result
   }
-
 }
