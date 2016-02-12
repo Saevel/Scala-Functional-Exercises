@@ -15,7 +15,7 @@ import scala.util.Random
 @RunWith(classOf[JUnitRunner])
 class LambdasTest extends FunSuite with Checkers with PropertyChecks {
 
-  val lowerBoundGenerator = Gen.choose(-50, 49);
+  val lowerBoundGenerator = Gen.choose(0, 49);
 
   val upperBoundGenerator = Gen.choose(50, 100);
 
@@ -67,14 +67,6 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
     }
   } yield((result ++ numberOccurences, number, count))
 
-
-  test("is defined for all integer collections") {
-    check( Prop.forAll(sizedCollectionGenerator(20)) { collection => {
-        (collection.countingSort() != null);
-      }
-    })
-  }
-
   test("output elements are sorted") {
     check( Prop.forAll(sizedCollectionGenerator(20)) { collection => {
         val result = collection.countingSort()
@@ -96,12 +88,19 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
 
       val translated = collection.translateCollection(collection)
 
-      var result = true;
-      for(originalElement <- collection; translatedElement <- translated) {
-        result = result && (originalElement == translatedElement)
+      if(translated.size == 0) {
+        true;
       }
+      else {
+        var result = true;
+        var i = 0;
+        for(translatedElement <- translated) {
+          result = result && (collection(i) == translatedElement)
+          i += 1
+        }
 
-      result
+        result
+      }
     })
   }
 
@@ -109,52 +108,22 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
 
     check(Prop.forAll(sizedCollectionGenerator(20)) {collection => {
 
-      val min = collection.min
-
-      val translated = collection.translateCollection(collection)
-
-      var result = true;
-
-      var originalElement:Int = 0;
-      var i:Int = 0
-      for(translatedElement <- translated) {
-        originalElement = collection(i)
-        result = result && (translatedElement == originalElement - min)
-        i = i + 1
+      if(collection.size == 0) {
+        true;
       }
+      else {
+        val min = collection.min
+        val translated = collection.translateCollection(collection)
 
-      result
+        var result = true;
+        var i:Int = 0
+        for(translatedElement <- translated) {
+          result = result && (translatedElement == (collection(i) - min))
+          i = i + 1
+        }
+
+        result
+      }
     }})
   }
-
-  test("occurence count is defined for all integer collections") {
-    check( Prop.forAll(sizedCollectionGenerator(20)) { collection =>
-      val result = collection.countOccurences(collection);
-
-      result != null && result.size == collection.size
-    })
-  }
-
-  test("element occurence count") {
-    check(Prop.forAll(assuredCountCollectionGenerator) { triple =>
-
-      val (collection, number, count) = triple;
-
-      val occurenceCount = collection.countOccurences(collection);
-
-      occurenceCount(number) == count;
-    })
-  }
-
-  /*
-  test("element is inserted into the final array at a correct place") {
-    check( Prop.forAll(assuredCountCollectionGenerator) { triple =>
-      val (collection, number, count) = triple;
-
-      val finalArray = collection.fillFinalArray
-
-      finalArray(count-1) == number
-    })
-  }
-  */
 }

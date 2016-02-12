@@ -1,5 +1,7 @@
 package prv.zielony.scala.tutorial.functional.programming.lambdas
 
+import scala.collection.mutable.ListBuffer
+
 /**
  * Created by zielony on 07.02.16.
  */
@@ -9,47 +11,72 @@ trait CountingSortable { /*collection:Traversable[Int] =>*/
 
   var translateCollection:(Traversable[Int] => Traversable[Int]) = { collection =>
 
-    val min = collection.min
-    collection.map { element =>
-      element - min
+    if(collection.size == 0) {
+      collection;
+    }
+    else {
+      val min = collection.min
+      collection.map { element =>
+        element - min
+      }
     }
   }
 
   var countOccurences:(Traversable[Int] => Array[Int]) = { collection =>
 
-    val occurences:Array[Int] = new Array[Int](collection.max)
-
-    for(element <- collection) {
-      occurences(element) += 1
+    if(collection.size == 0 ){
+      Array.empty
     }
+    else {
+      val occurences:Array[Int] = new Array[Int](collection.max + 1)
 
-    for(i <- 1 to occurences.size){
-      occurences(i) += occurences(i-1)
+      for(element <- collection) {
+        occurences(element) += 1
+      }
+
+      for(i <- 1 until occurences.size){
+        occurences(i) += occurences(i-1)
+      }
+
+      occurences
     }
-
-    occurences
   }
 
   var fillFinalArray:(Array[Int] => Traversable[Int]) = { array =>
 
-    var result:List[Int] = List()
-
-    for(i <- 1 to array.size) {
-      for( j <- array(i-1) to array(i)) {
-        result = i :: result
-      }
+    if(array.size == 0) {
+      array
     }
+    else {
+      var result:ListBuffer[Int] = new ListBuffer()
 
-    result
+      for(i <- 1 until array.size) {
+        for( j <- (array(i-1) until array(i))) {
+          result += i
+        }
+      }
+
+      result
+    }
   }
 
   var reverseTranslate:((Traversable[Int], Int) => Traversable[Int]) = { (collection, min) =>
-    collection.map { element =>
-      element + min
+
+    if(collection.size == 0 || collection.min == collection.max) {
+      collection;
+    }
+    else {
+      collection.map { element =>
+        element + min
+      }
     }
   }
 
   def countingSort():Traversable[Int] = {
+
+    if(collection.size == 0 || collection.min == collection.max) {
+      return collection;
+    }
 
     val mappedCollection = translateCollection(collection)
 
@@ -57,26 +84,14 @@ trait CountingSortable { /*collection:Traversable[Int] =>*/
 
     val summedOccurences = sumOccurences(occurences)
 
-    reverseTranslate(fillFinalArray(summedOccurences), findMin(collection))
+    reverseTranslate(fillFinalArray(summedOccurences), collection.min)
   }
 
   private def sumOccurences(input:Array[Int]):Array[Int] = {
-    for(i <- 1 to input.size) {
+    for(i <- 1 until input.size) {
       input(i) = input(i) + input(i-1)
     }
 
     input
-  }
-
-  private def findMin(col:Traversable[Int]):Int = {
-    var min = Int.MaxValue;
-
-    for(element <- col) {
-      if(element < min) {
-        min = element
-      }
-    }
-
-    min
   }
 }
