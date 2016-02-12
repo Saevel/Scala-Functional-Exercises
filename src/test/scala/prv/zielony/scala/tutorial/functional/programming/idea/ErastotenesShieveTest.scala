@@ -14,13 +14,13 @@ import org.scalatest.prop.{Checkers, PropertyChecks};
 @RunWith(classOf[JUnitRunner])
 class ErastotenesShieveTest extends FunSuite with Checkers with PropertyChecks {
 
-  val intervalSizeGenerator = Gen.choose(4, 100);
+  val intervalSizeGenerator = Gen.choose(8, 100)
 
-  val sourceGenerator:Gen[List[Int]] = for {
-    size <- intervalSizeGenerator
-    elements <- Gen.listOfN(size, Gen.choose(2, 300))
-  } yield(elements)
+  val listGenerator:Gen[List[Int]] = Gen.listOfN(20, Gen.choose(300, 1000))
 
+  val sourceGenerator = listGenerator.suchThat {list =>
+    list.size >= 12
+  }
 
   test("All returned results are primes") {
     check( Prop.forAll(sourceGenerator){ data =>
@@ -36,8 +36,11 @@ class ErastotenesShieveTest extends FunSuite with Checkers with PropertyChecks {
 
   private def isPrime(number:Int):Boolean = {
 
-    for(i <-  2 to Math.floor(Math.sqrt(number)).toInt) {
-      if(number % i == 0) return false;
+    for(i <- 2 to number) {
+      if(number % i == 0 && number != i) {
+        //return false
+        throw new IllegalArgumentException(s"Number $number is divisible by $i")
+      };
     }
 
     return true;

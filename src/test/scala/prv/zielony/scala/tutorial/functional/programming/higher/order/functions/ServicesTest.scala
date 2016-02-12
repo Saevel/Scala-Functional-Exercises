@@ -16,6 +16,15 @@ class ServicesTest extends FunSuite with Checkers with PropertyChecks {
 
   val ageGenerator = Gen.choose(0, 99);
 
+  val account:Account with PrimaryKey[Long] = new Account(10L, 12.30) with PrimaryKey[Long] {
+    override val id: Long = 10L
+  }
+
+  test("testSave") {
+    dao.save[Long, Account](account);
+  }
+
+
   /*
   val personGenerator:Gen[Person with PrimaryKey[Long]] = for {
     uuid <- Gen.uuid

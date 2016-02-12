@@ -23,7 +23,7 @@ class StreamHeapTest extends FunSuite with Checkers with PropertyChecks {
     list <- Gen.listOfN(size, Gen.choose(0, 100))
   } yield(list)
 
-  val intHeap:HeapStream[Int] = new HeapStream[Int](Implicits.compareInts)
+  val intHeap:HeapStream[Int] = new HeapStream[Int](0, null, null)(Implicits.compareInts)
 
   test("Fulfills max heap property") {
     check( Prop.forAll(intCollectionGenerator) { list =>

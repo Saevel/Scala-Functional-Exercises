@@ -15,17 +15,36 @@ import scala.util.Random
 @RunWith(classOf[JUnitRunner])
 class LambdasTest extends FunSuite with Checkers with PropertyChecks {
 
-  val lowerBoundGenerator = Gen.choose(-50, 49);
+  val lowerBoundGenerator = Gen.choose(0, 49);
 
   val upperBoundGenerator = Gen.choose(50, 100);
 
-  val sizeGenerator = Gen.choose(0, 20);
+  val sizeGenerator = Gen.choose(2, 20);
 
+  /*
   val collectionGenerator:Gen[List[Int]] = for {
     lowerBound <- lowerBoundGenerator
     upperBound <- upperBoundGenerator
     size <- sizeGenerator
     result <- Gen.listOfN(size, Gen.choose(lowerBound, upperBound))
+  } yield(result)
+  */
+
+  def sizedCollectionGenerator(size:Int) = Gen.sized { size =>
+    val basic = for {
+      lowerBound <- lowerBoundGenerator
+      upperBound <- upperBoundGenerator
+      result <- Gen.listOfN(size, Gen.choose(lowerBound, upperBound))
+    } yield(result)
+
+    basic.suchThat { collection =>
+      collection.size >= size
+    }
+  }
+
+  val collectionGenerator = for {
+   size <- sizeGenerator
+   result <- sizedCollectionGenerator(size)
   } yield(result)
 
   val intGenerator = Gen.choose[Int](0, 1000);
@@ -33,7 +52,7 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
   val zeroBasedCollectionGenerator:Gen[List[Int]] = for {
     zero <- Gen.const[Int](0)
     size <- sizeGenerator
-    list <- Gen.listOfN[Int](size, intGenerator)
+    list <- sizedCollectionGenerator(size)
   } yield(zero :: list)
 
   val assuredCountCollectionGenerator:Gen[Tuple3[List[Int], Int, Int]] = for {
@@ -48,15 +67,8 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
     }
   } yield((result ++ numberOccurences, number, count))
 
-  test("is defined for all integer collections") {
-    check( Prop.forAll(collectionGenerator) { collection => {
-        collection.countingSort() != null;
-      }
-    })
-  }
-
   test("output elements are sorted") {
-    check( Prop.forAll(collectionGenerator) { collection => {
+    check( Prop.forAll(sizedCollectionGenerator(20)) { collection => {
         val result = collection.countingSort()
 
         var sorted:Boolean = true;
@@ -76,61 +88,42 @@ class LambdasTest extends FunSuite with Checkers with PropertyChecks {
 
       val translated = collection.translateCollection(collection)
 
-      var result = true;
-      for(originalElement <- collection; translatedElement <- translated) {
-        result = result && (originalElement == translatedElement)
+      if(translated.size == 0) {
+        true;
       }
+      else {
+        var result = true;
+        var i = 0;
+        for(translatedElement <- translated) {
+          result = result && (collection(i) == translatedElement)
+          i += 1
+        }
 
-      result
+        result
+      }
     })
   }
 
   test("translation value is equal to collection minimum") {
 
-    check(Prop.forAll(collectionGenerator) {collection => {
+    check(Prop.forAll(sizedCollectionGenerator(20)) {collection => {
 
-      val min = collection.min
-
-      val translated = collection.translateCollection(collection)
-
-      var result = true;
-      for(originalElement <- collection; translatedElement <- translated) {
-        result = result && (originalElement == translatedElement - min)
+      if(collection.size == 0) {
+        true;
       }
+      else {
+        val min = collection.min
+        val translated = collection.translateCollection(collection)
 
-      result
+        var result = true;
+        var i:Int = 0
+        for(translatedElement <- translated) {
+          result = result && (translatedElement == (collection(i) - min))
+          i = i + 1
+        }
+
+        result
+      }
     }})
-
   }
-
-  test("occurence count is defined for all integer collections") {
-    check( Prop.forAll(collectionGenerator) { collection =>
-      val result = collection.countOccurences(collection);
-
-      result != null && result.size == collection.size
-    })
-  }
-
-  test("element occurence count") {
-    check(Prop.forAll(assuredCountCollectionGenerator) { triple =>
-
-      val (collection, number, count) = triple;
-
-      val occurenceCount = collection.countOccurences(collection);
-
-      occurenceCount(number) == count;
-    })
-  }
-
-  /*
-  test("element is inserted into the final array at a correct place") {
-    check( Prop.forAll(assuredCountCollectionGenerator) { triple =>
-      val (collection, number, count) = triple;
-
-      val finalArray = collection.fillFinalArray
-
-      finalArray(count-1) == number
-    })
-  }
-  */
 }

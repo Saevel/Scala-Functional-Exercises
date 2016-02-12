@@ -21,7 +21,7 @@ trait EntityManager {
                                        clazz:Class[EntityType]):Option[EntityType with PrimaryKey[_]] = {
 
     for(entity <- persistedObjects) {
-      if(entity.getClass.isAssignableFrom(clazz) && entity.id == id) {
+      if(clazz.isAssignableFrom(entity.getClass) && entity.id == id) {
         return Some(entity.asInstanceOf[EntityType with PrimaryKey[PrimaryKeyType]]);
       }
     }

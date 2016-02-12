@@ -14,7 +14,7 @@ import java.io.File;
 @RunWith(classOf[JUnitRunner])
 class FileParserTest extends FunSuite with Checkers with PropertyChecks with FileParser {
 
-  val existingFileGenerator = Gen.oneOf("existing.file", "nonparseable.file")
+  val existingFileGenerator = Gen.const("existing.file")
 
   val nonParseableFileGenerator = Gen.const("nonparseable.file")
 
@@ -25,17 +25,22 @@ class FileParserTest extends FunSuite with Checkers with PropertyChecks with Fil
   test("defined for an existing file") {
     check( Prop.forAll(existingFileGenerator){ file =>
 
-      val inputFile = new File(getClass.getResource("/" + file).getFile)
-      parseIntFile(Option(inputFile)).isRight
+      val inputFile = Option(getClass.getResource("/" + file)).map { f =>
+        new File(f.getFile)
+      }
+
+      parseIntFile(inputFile).isRight
     })
   }
 
   test("FileNotFoundError for nonexisting file") {
     check(Prop.forAll(nonexistentFileGenerator) { file =>
 
-      val inputFile = new File(getClass.getResource("/" + file).getFile)
+      val inputFile = Option(getClass.getResource("/" + file)).map { f =>
+        new File(f.getFile)
+      }
 
-      parseIntFile(Option(inputFile)) match {
+      parseIntFile(inputFile) match {
         case Left(fileNotFound:FileNotFoundError) => true
         case _ => false
       }
@@ -45,9 +50,11 @@ class FileParserTest extends FunSuite with Checkers with PropertyChecks with Fil
   test("NumberFormatError for wrongly formated file") {
     check(Prop.forAll(nonParseableFileGenerator) { file =>
 
-      val inputFile = new File(getClass.getResource("/" + file).getFile)
+      val inputFile = Option(getClass.getResource("/" + file)).map { f =>
+        new File(f.getFile)
+      }
 
-      parseIntFile(Option(inputFile)) match {
+      parseIntFile(inputFile) match {
         case Left(numberFormatError:NumberFormatError) => true
         case _ => false
       }

@@ -7,7 +7,7 @@ import scala.util.Random
   */
 object TransferService {
 
-  def transfer(request:TransferRequest, token:Long):TransferResult = executeTransaction(request) match {
+  def transfer(request:TransferRequest, token: => Long):TransferResult = executeTransaction(request) match {
 
     case TransactionSuccessful => TransferResult(TransactionSuccessful, Some(token));
 
