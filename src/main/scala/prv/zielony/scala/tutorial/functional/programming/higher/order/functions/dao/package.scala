@@ -26,10 +26,9 @@ package object dao {
     }
   }
 
-  val saveAccount = saveDef[Long, Account](defaultEntityManager)_
+  val saveAccount = ???
 
-  def save[PrimaryKeyType, EntityType](entity: EntityType with PrimaryKey[PrimaryKeyType]) =
-    saveDef[PrimaryKeyType, EntityType](defaultEntityManager)(entity)
+  def save[PrimaryKeyType, EntityType](entity: EntityType with PrimaryKey[PrimaryKeyType]) = ???
 
-  val findPersonById:(Long => Option[Person with PrimaryKey[Long]]) = dao.findPersonById
+  val findPersonById:(Long => Option[Person with PrimaryKey[Long]]) = ???
 }

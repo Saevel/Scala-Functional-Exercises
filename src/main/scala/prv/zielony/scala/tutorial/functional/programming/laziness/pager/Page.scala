@@ -9,11 +9,5 @@ import scala.io.Source
  */
 class LinePager(file:File, pageSize:Int) {
 
-  var position:Int = 0;
-
-  val stream:Stream[String] = Source.fromFile(file).getLines().toStream
-
-  def next():Traversable[String] = {
-    stream.take(pageSize).toList
-  }
+  def next():Traversable[String] = ???
 }
