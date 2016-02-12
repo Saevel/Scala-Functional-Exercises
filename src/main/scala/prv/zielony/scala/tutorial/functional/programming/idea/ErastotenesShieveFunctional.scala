@@ -16,7 +16,7 @@ class ErastotenesShieveFunctional extends PrimeShieve {
     for(divisor <- searchRange) {
       for(element <- data) {
 
-        if(element % divisor == 0) {
+        if(element % divisor == 0 && element != divisor) {
           removed = element :: removed
         }
 
