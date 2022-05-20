@@ -8,8 +8,9 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    compile 'org.scala-lang:scala-library:2.11.7'
-    testCompile 'org.scalacheck:scalacheck_2.11:1.12.5'
-    testCompile 'org.scalatest:scalatest_2.11:2.2.6'
+    implementation 'org.scala-lang:scala-library:2.11.8'
+
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation 'org.scalatest:scalatest_2.11:3.0.5'
+    testImplementation 'org.scalacheck:scalacheck_2.11:1.14.0'
 }
